@@ -22,7 +22,6 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends Activity {
 
@@ -33,6 +32,7 @@ public class MainActivity extends Activity {
     private ActionBarDrawerToggle drawerToggle;
     private int currentPosition;
     public String link;
+    private ArrayAdapter<Title> adapter;
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -48,22 +48,10 @@ public class MainActivity extends Activity {
         getActionBar().setHomeButtonEnabled(true);
 
         //
-        UpdateMainActivity upMainActivity = new UpdateMainActivity();
-        upMainActivity.execute();
-
-        //
-        mt = new UpdateTitles();
-        mt.execute();
-        try {
-            mt.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
         drawerList = (ListView)findViewById(R.id.drawer);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList.setAdapter(new ArrayAdapter<Title>(this, android.R.layout.simple_list_item_activated_1, titles));
+        mt = new UpdateTitles();
+        mt.execute();
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
         //Создание ActionBarDrawerToggle
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,R.string.open_drawer, R.string.close_drawer) {
@@ -89,6 +77,9 @@ public class MainActivity extends Activity {
                     }
                 }
         );
+        //
+        UpdateMainActivity upMainActivity = new UpdateMainActivity();
+        upMainActivity.execute();
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener, View.OnClickListener {
@@ -114,7 +105,16 @@ public class MainActivity extends Activity {
 
         }
     }
+
     private class UpdateTitles extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            adapter = new ArrayAdapter<Title>(getApplicationContext(), android.R.layout.simple_list_item_activated_1, titles);
+            adapter.notifyDataSetChanged();
+            drawerList.setAdapter(adapter);
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -142,6 +142,7 @@ public class MainActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            try{
             link = "https://monocler.ru/";
             Fragment fragment = new TitleMaterialFragment();
             FragmentTransaction ft = getFragmentManager().beginTransaction();
@@ -149,6 +150,9 @@ public class MainActivity extends Activity {
             ft.addToBackStack(null);
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
             ft.commit();
+            } catch (Exception e){
+
+            }
             return null;
         }
 

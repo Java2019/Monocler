@@ -16,7 +16,14 @@
             android:id="@+id/id_web"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1.23"
+            android:layout_weight="55"
             android:ellipsize="marquee">
     </WebView>
+    <TextView
+            android:id="@+id/id_text"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"
+            android:singleLine="false"
+            android:textSize="18dp"/>
 </LinearLayout>

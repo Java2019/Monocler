@@ -4,11 +4,17 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.ScrollingMovementMethod;
+import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -17,7 +23,7 @@ public class TitleText extends Activity {
 
     private String link;
     private String photo;
-    private String text;
+    private String text = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +32,7 @@ public class TitleText extends Activity {
         //
         ImageView imageView = (ImageView) findViewById(R.id.id_image);
         WebView webView = (WebView)  findViewById(R.id.id_web);
+        TextView textView = (TextView) findViewById(R.id.id_text);
         //
         Intent intent = getIntent();
         link = intent.getStringExtra("link");
@@ -42,10 +49,15 @@ public class TitleText extends Activity {
         }
 
         webView.loadDataWithBaseURL(null, text,"text/html", "UTF-8", null);//setText(Html.fromHtml(text));
-        //webView.setSelected(true);
+        webView.setVisibility(View.INVISIBLE);
+        imageView.setVisibility(View.INVISIBLE);
         Picasso.with(this).load(photo).fit().into(imageView);
+        textView.setText(Html.fromHtml(text));
+        textView.setMovementMethod(new ScrollingMovementMethod());
     }
     private class UpdateTitlesText extends AsyncTask<Void, Void, Void> {
+
+        private int index = 0;
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -56,8 +68,15 @@ public class TitleText extends Activity {
                 //e.printStackTrace();
             }
 
-            text = document.getElementById("left-area").before("</div> \t<!-- end #left-area -->").toString();
-
+            Elements elements = document.getElementById("left-area").getElementsByTag("p");
+            for (Element element : elements) {
+                index++;
+                if (index == 1 )
+                    text = text + element.toString();
+                else if (element.getAllElements().size() == 1)
+                    text = text + element.toString();
+            }
+            text = text.replaceAll("<p>&nbsp;</p>", "");
             return null;
         }
 

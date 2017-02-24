@@ -21,7 +21,7 @@
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:layout_alignParentBottom="true"
-                android:textColor="#FFCCCC"
+                android:textColor="@color/colorLogo"
                 android:textSize="30dp"/>
     </RelativeLayout>
 </android.support.v7.widget.CardView>
